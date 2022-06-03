@@ -8,18 +8,15 @@ pacman --noconfirm -Sy archlinux-keyring
 loadkeys us
 timedatectl set-ntp true
 lsblk
-echo "Enter the drive: "
+echo "Enter the drive (e.g /dev/sda or /dev/nvme0n1): "
 read drive
 cfdisk $drive
 echo "Enter the linux partition: "
 read partition
 mkfs.ext4 $partition
-read -p "Did you also create efi partition? [y/n]" answer
-if [[ $answer = y ]]; then
-    echo "Enter EFI partition: "
-    read efipartition
-    mkfs.vfat -F 32 $efipartition
-fi
+echo "Enter EFI partition: "
+read efipartition
+mkfs.vfat -F 32 $efipartition
 mount $partition /mnt
 pacstrap /mnt base base-devel linux linux-firmware
 genfstab -U /mnt >>/mnt/etc/fstab
@@ -44,6 +41,7 @@ echo $hostname >/etc/hostname
 echo "127.0.0.1       localhost" >>/etc/hosts
 echo "::1             localhost" >>/etc/hosts
 echo "127.0.1.1       $hostname.localdomain $hostname" >>/etc/hosts
+curl https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts > /etc/hosts
 mkinitcpio -P
 passwd
 pacman --noconfirm -S grub efibootmgr os-prober
@@ -69,7 +67,7 @@ packages=(
 )
 pacman -S --noconfirm $packages
 
-read -p "Select your GPU [ 1=>Intel 2=>AMD 3=>Nvidia 4=>vmware ] " gpu
+read -p "Select your GPU [ 1=>Intel 2=>AMD 3=>Nvidia 4=>VMware 5=>None ] " gpu
 if [[ $gpu = 1 ]]; then
     pacman -S --noconfirm xf86-video-intel
 elif [[ $gpu = 2 ]]; then
