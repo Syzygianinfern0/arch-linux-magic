@@ -1,7 +1,8 @@
+# Originally: https://github.com/Bugswriter/arch-linux-magic/blob/master/arch_install.sh
 # == MY ARCH SETUP INSTALLER == #
 #part1
 printf '\033c'
-echo "Welcome to bugswriter's arch installer script"
+echo "Welcome to Syzygianinfern0's arch installer script"
 sed -i "s/^#ParallelDownloads = 5$/ParallelDownloads = 15/" /etc/pacman.conf
 pacman --noconfirm -Sy archlinux-keyring
 loadkeys us
@@ -55,20 +56,32 @@ sed -i 's/quiet/pci=noaer/g' /etc/default/grub
 sed -i 's/GRUB_TIMEOUT=5/GRUB_TIMEOUT=0/g' /etc/default/grub
 grub-mkconfig -o /boot/grub/grub.cfg
 
-pacman -S --noconfirm xorg-server xorg-xinit xorg-xkill xorg-xsetroot xorg-xbacklight xorg-xprop \
-    noto-fonts noto-fonts-emoji noto-fonts-cjk ttf-jetbrains-mono ttf-joypixels ttf-font-awesome \
-    sxiv mpv zathura zathura-pdf-mupdf ffmpeg imagemagick \
-    fzf man-db xwallpaper python-pywal unclutter xclip maim \
-    zip unzip unrar p7zip xdotool papirus-icon-theme brightnessctl \
-    dosfstools ntfs-3g git sxhkd zsh pipewire pipewire-pulse \
-    emacs-nox arc-gtk-theme rsync qutebrowser dash \
-    xcompmgr libnotify dunst slock jq aria2 cowsay \
-    dhcpcd connman wpa_supplicant rsync pamixer mpd ncmpcpp \
-    zsh-syntax-highlighting xdg-user-dirs libconfig \
-    bluez bluez-utils
+packages=(
+    xorg-server xorg-xinit xorg-xkill xorg-xsetroot xorg-xbacklight xorg-xprop                     # xorg
+    noto-fonts noto-fonts-emoji noto-fonts-cjk ttf-jetbrains-mono ttf-joypixels ttf-font-awesome   # fonts
+    sxiv mpv zathura zathura-pdf-mupdf firefox                                                     # essential apps
+    man-db dosfstools ntfs-3g git brightnessctl xdotool jq dash zsh xdg-user-dirs                  # core tools
+    fzf xclip maim sxhkd ffmpeg imagemagick libnotify                                              # essential tools
+    arc-gtk-theme papirus-icon-theme xcompmgr dunst slock cowsay xwallpaper python-pywal unclutter # customization
+    dhcpcd connman wpa_supplicant rsync aria2                                                      # networking
+    zip unzip unrar p7zip                                                                          # zip
+    pipewire pipewire-pulse pamixer mpd ncmpcpp bluez bluez-utils                                  # sound and bluetooth
+)
+pacman -S --noconfirm $packages
+
+read -p "Select your GPU [ 1=>Intel 2=>AMD 3=>Nvidia 4=>vmware ] " gpu
+if [[ $gpu = 1 ]]; then
+    pacman -S --noconfirm xf86-video-intel
+elif [[ $gpu = 2 ]]; then
+    pacman -S --noconfirm xf86-video-amdgpu
+elif [[ $gpu = 3 ]]; then
+    pacman -S --noconfirm nvidia nvidia-utils nvidia-settings
+elif [[ $gpu = 4 ]]; then
+    pacman -S --noconfirm xf86-video-vmware
+fi
 
 systemctl enable NetworkManager.service
-rm /bin/sh
+mv /bin/sh /bin/sh.bak
 ln -s dash /bin/sh
 echo "%wheel ALL=(ALL) NOPASSWD: ALL" >>/etc/sudoers
 echo "Enter Username: "
@@ -114,8 +127,9 @@ git clone https://aur.archlinux.org/pikaur.git
 cd pikaur
 makepkg -fsri
 cd
-pikaur -S libxft-bgra-git yt-dlp-drop-in
-mkdir dl dox imp music pix pub code
+pikaur -S libxft-bgra-git yt-dlp-drop-in update-grub
+update-grub
+mkdir dox dwns mux pix pub vids
 
 ln -s ~/.config/x11/xinitrc .xinitrc
 ln -s ~/.config/shell/profile .zprofile
