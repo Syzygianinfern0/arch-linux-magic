@@ -67,7 +67,7 @@ packages=(
     zip unzip unrar p7zip                                                                          # zip
     pipewire pipewire-pulse pamixer mpd ncmpcpp bluez bluez-utils                                  # sound and bluetooth
 )
-pacman -S --noconfirm $packages
+pacman -S --noconfirm "${packages[@]}"
 
 read -p "Select your GPU [ 1=>Intel 2=>AMD 3=>Nvidia 4=>VMware 5=>None ] " gpu
 if [[ $gpu = 1 ]]; then
