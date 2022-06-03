@@ -4,6 +4,7 @@
 printf '\033c'
 echo "Welcome to Syzygianinfern0's arch installer script"
 sed -i "s/^#ParallelDownloads = 5$/ParallelDownloads = 15/" /etc/pacman.conf
+echo "Server = https://cloudflaremirrors.com/archlinux/$repo/os/$arch" > /etc/pacman.d/mirrorlist
 pacman --noconfirm -Sy archlinux-keyring
 loadkeys us
 timedatectl set-ntp true
@@ -29,6 +30,7 @@ exit
 printf '\033c'
 pacman -S --noconfirm sed
 sed -i "s/^#ParallelDownloads = 5$/ParallelDownloads = 15/" /etc/pacman.conf
+echo "Server = https://cloudflaremirrors.com/archlinux/$repo/os/$arch" > /etc/pacman.d/mirrorlist
 ln -sf /usr/share/zoneinfo/Asia/Kolkata /etc/localtime
 hwclock --systohc
 echo "en_US.UTF-8 UTF-8" >>/etc/locale.gen
@@ -41,7 +43,7 @@ echo $hostname >/etc/hostname
 echo "127.0.0.1       localhost" >>/etc/hosts
 echo "::1             localhost" >>/etc/hosts
 echo "127.0.1.1       $hostname.localdomain $hostname" >>/etc/hosts
-curl https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts > /etc/hosts
+curl https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts >> /etc/hosts
 mkinitcpio -P
 passwd
 pacman --noconfirm -S grub efibootmgr os-prober
@@ -86,7 +88,7 @@ echo "Enter Username: "
 read username
 useradd -m -G wheel -s /bin/zsh $username
 passwd $username
-echo "Pre-Installation Finish Reboot now"
+echo "Pre-Installation Finish"
 ai3_path=/home/$username/arch_install3.sh
 sed '1,/^#part3$/d' arch_install2.sh >$ai3_path
 chown $username:$username $ai3_path
